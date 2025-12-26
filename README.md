@@ -195,3 +195,7 @@ sudo rm /etc/systemd/system/wake_bot.service
 ### 📝 License
 
 This project is open-source. Feel free to modify and adapt it to your needs.
+
+---
+
+
