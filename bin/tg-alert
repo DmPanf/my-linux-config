@@ -1,1 +1,27 @@
-#
+#!/bin/bash
+
+# Проверяем SSH сессию
+if [ -n "$SSH_CLIENT" ]; then
+
+    # Конфиг (Новый путь)
+    CONFIG="/etc/default/tg_bot.env"
+    [ -f "$CONFIG" ] && source "$CONFIG"
+
+    # Данные
+    CLIENT_IP=$(echo $SSH_CLIENT | awk '{print $1}')
+    SRV_NAME="${host:-$(hostname)}"
+    USER_LOGIN=$(whoami)
+
+    # Сообщение (HTML)
+    MSG="🔐 SSH: <b>$USER_LOGIN</b> ➡️ <b>$SRV_NAME</b> [$CLIENT_IP]"
+
+    # Отправка в фоне
+    (
+      if [ -n "$TOKEN" ] && [ -n "$CHAT_ID1" ]; then
+         /usr/bin/curl -s -m 2 -X POST "https://api.telegram.org/bot$TOKEN/sendMessage" \
+         -d chat_id="$CHAT_ID1" \
+         -d parse_mode="HTML" \
+         -d text="$MSG" > /dev/null 2>&1
+      fi
+    ) &
+fi
