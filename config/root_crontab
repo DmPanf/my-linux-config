@@ -11,3 +11,4 @@ MAILTO=""
 
 # Reboot Sequence: Thursday (Target 04:25 MSK)
 22 1 * * 4 /usr/local/bin/tg-reboot "04:25 AM MSK"
+
