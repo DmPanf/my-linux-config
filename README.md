@@ -172,7 +172,14 @@ Automatic. You don't need to run anything. Any SSH connection will trigger a not
 
 ### 🔄 Uninstallation
 
-If you want to remove the toolkit:
+- To check:
+  
+```bash
+sudo systemctl restart wake_bot.service
+
+```
+
+- If you want to remove the toolkit:
 
 ```bash
 sudo rm /usr/local/bin/tg-*
