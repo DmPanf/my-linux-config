@@ -31,7 +31,7 @@ REPO_DIR=$(dirname "$(readlink -f "$0")")
 # 2. Установка зависимостей
 echo -e "${YELLOW}Installing dependencies (figlet, curl)...${NC}"
 apt-get update -qq
-apt-get install -y figlet curl cron > /dev/null
+apt-get install -y figlet curl ncal neofetch mc cron > /dev/null
 echo -e "${GREEN}[OK]${NC} Dependencies installed."
 
 # 3. Установка скриптов в /usr/local/bin
