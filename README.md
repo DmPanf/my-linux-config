@@ -82,7 +82,7 @@ Download this toolkit to your local folder (e.g., `~/scr`).
 ```bash
 mkdir -p ~/scr
 cd ~/scr
-git clone [https://github.com/YOUR_USERNAME/my-linux-config.git](https://github.com/YOUR_USERNAME/my-linux-config.git)
+git clone https://github.com/DmPanf/my-linux-config.git
 cd my-linux-config
 
 ```
