@@ -1,14 +1,19 @@
 [Unit]
 Description=Telegram Startup Notification
-After=network-online.target
+# Ждем сеть, но не блокируем загрузку критически, если сети нет
+After=network.target network-online.target
 Wants=network-online.target
 
 [Service]
-Type=oneshot
+# Type=idle идеально для Pi: скрипт запустится, когда CPU освободится после загрузки ОС
+Type=idle
 User=root
 ExecStart=/usr/local/bin/tg-wake
+# Если скрипт упал, пробуем снова через 10 сек
 Restart=on-failure
-RestartSec=30
+RestartSec=10
+# Тайм-аут, чтобы скрипт не висел вечно
+TimeoutStartSec=60
 
 [Install]
 WantedBy=multi-user.target
