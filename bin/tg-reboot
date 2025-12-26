@@ -1,1 +1,33 @@
-#
+#!/bin/bash
+
+# 1. Загружаем конфиг
+CONFIG="/etc/default/tg_bot.env"
+if [ -f "$CONFIG" ]; then
+    set -a
+    source "$CONFIG"
+    set +a
+else
+    exit 1
+fi
+
+# 2. Аргументы
+# Принимаем строку времени как первый аргумент, или ставим дефолт
+TIME_TEXT="${1:-Scheduled}"
+SRV_NAME="${host:-$(hostname)}"
+
+# 3. Сообщение (Компактное)
+# ⏳ - песочные часы, показывающие ожидание
+MSG="⏳ <b>$SRV_NAME</b>: Reboot initiated.
+⏰ Target: <b>$TIME_TEXT</b>
+🔻 Server goes down in 3 minutes."
+
+# 4. Отправка
+if [ -n "$TOKEN" ] && [ -n "$CHAT_ID1" ]; then
+    /usr/bin/curl -s -m 5 -X POST "https://api.telegram.org/bot$TOKEN/sendMessage" \
+    -d chat_id="$CHAT_ID1" \
+    -d parse_mode="HTML" \
+    -d text="$MSG" > /dev/null 2>&1
+fi
+
+# 5. Сама команда перезагрузки (+3 минуты)
+/sbin/shutdown -r +3 "Planned reboot at $TIME_TEXT"
