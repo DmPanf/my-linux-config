@@ -1,0 +1,78 @@
+#!/bin/bash
+
+# 1. Среда и Пути
+export LC_ALL=C
+export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# 2. Конфиг (Новый путь FHS)
+CONFIG="/etc/default/tg_bot.env"
+if [ -f "$CONFIG" ]; then
+    set -a
+    source "$CONFIG"
+    set +a
+else
+    # Если конфига нет - молча выходим или шлем ошибку (тут просто выход)
+    exit 1
+fi
+
+# 3. Данные системы
+myName="${host:-$(hostname)}"
+
+# Температура
+if command -v vcgencmd &> /dev/null; then
+    myTemp=$(vcgencmd measure_temp | cut -c 6-)
+else
+    raw_temp=$(cat /sys/class/thermal/thermal_zone*/temp 2>/dev/null | head -n 1)
+    if [ -n "$raw_temp" ]; then
+        myTemp="$((raw_temp/1000)).0'C"
+    else
+        myTemp="N/A"
+    fi
+fi
+
+# Сеть (IPv4 only, no Docker)
+LAN=$(hostname -I | tr ' ' '\n' | grep -v ':' | grep -vE '^172\.(1[6-9]|2[0-9]|3[0-1])\.|^127\.' | paste -sd " " -)
+WAN=$(wget -qO- --timeout=5 ipinfo.io/ip)
+
+# CPU
+CPU_Cores=$(nproc)
+CPU_Model=$(grep -m1 "model name" /proc/cpuinfo | cut -d: -f2 | sed -E 's/\(R\)|\(TM\)|\(tm\)|Intel|AMD|CPU|Processor//g' | xargs | awk '{print $1, $2, $3}')
+[ -z "$CPU_Model" ] && CPU_Model="Generic"
+CPU_INFO="${CPU_Cores}x ${CPU_Model}"
+
+# OS
+if [ -f /etc/os-release ]; then
+    myOS=$(grep PRETTY_NAME /etc/os-release | cut -d '"' -f 2)
+    myOS=$(echo "$myOS" | sed 's/GNU\/Linux //' | sed 's/ LTS//')
+else
+    myOS=$(hostnamectl | grep System | cut -d ":" -f2 | xargs)
+fi
+
+# RAM
+RAM_DATA=$(free -h | awk '/^Mem:/ {print $3 "/" $2}')
+
+# DISK (Stable output)
+DISK_DATA=$(df -h --output=size,pcent,avail / | tail -n 1)
+dTotal=$(echo "$DISK_DATA" | awk '{print $1}')
+dPcent=$(echo "$DISK_DATA" | awk '{print $2}')
+dFree=$(echo "$DISK_DATA" | awk '{print $3}')
+
+dPcentNum=$(echo "$dPcent" | tr -dc '0-9')
+[[ -z "$dPcentNum" ]] && dPcentNum=0
+if [ "$dPcentNum" -gt 85 ]; then dIcon="🔴"; else dIcon="📀"; fi
+
+# 4. Сообщение
+MESSAGE="$myName 🌡$myTemp ▫️ $Place $Port
+├─ IP: [$LAN / $WAN]
+├─ OS: $myOS
+├─ CPU: $CPU_INFO
+├─ RAM: $RAM_DATA
+└─ $dIcon Total: $dTotal | Used: $dPcent | Free: $dFree"
+
+# 5. Отправка
+if [ -n "$TOKEN" ] && [ -n "$CHAT_ID1" ]; then
+    URL="https://api.telegram.org/bot$TOKEN/sendMessage"
+    /usr/bin/curl -s -X POST "$URL" -d chat_id="$CHAT_ID1" -d text="$MESSAGE" > /dev/null
+fi
+
+exit 0
