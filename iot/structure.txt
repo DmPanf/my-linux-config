@@ -1,0 +1,10 @@
+my-linux-config/
+├── iot/
+│   ├── bin/
+│   │   └── iot-agent         # Главный скрипт-диспетчер
+│   └── actions/
+│       ├── START_SSH         # Скрипт поднятия туннеля
+│       ├── REBOOT            # Скрипт перезагрузки
+│       └── RESTART_DLNA      # (Пример) Скрипт для сервисов
+├── install_iot.sh            # ГЛАВНЫЙ УСТАНОВЩИК
+└── README.md
