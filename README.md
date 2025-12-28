@@ -1,4 +1,4 @@
-## 🐧 Linux Server Telegram Assistant & Admin Toolkit
+## 🐧 Linux Server Telegram Assistant & Admin Toolkit (v2.1)
 
 ![Bash](https://img.shields.io/badge/Language-Bash-4EAA25?style=flat-square&logo=gnu-bash&logoColor=white)
 ![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20Raspberry%20Pi-FCC624?style=flat-square&logo=linux&logoColor=black)
